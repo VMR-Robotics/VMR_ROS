@@ -1,0 +1,9 @@
+<launch>
+  <node pkg="vmr_ros_pkg" type="listener" name="lx_hontai" output="screen">
+    <!-- 加载话题配置 -->
+    <rosparam command="load" file="$(find vmr_ros_pkg)/config/lx_config.yaml" />
+    
+    <!-- 也可以直接在这里覆盖参数 -->
+    <!-- <param name="odom_topic" value="/new_odom" /> -->
+  </node>
+</launch>

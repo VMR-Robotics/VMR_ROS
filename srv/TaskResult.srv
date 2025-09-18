@@ -1,0 +1,6 @@
+string task_id
+---
+int32 code
+int32 task_flag
+int32 task_result
+string task_id

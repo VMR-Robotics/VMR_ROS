@@ -1,0 +1,11 @@
+stages: [deploy]
+sync-master-to-gitee:
+  stage: deploy
+  image: alpine/git
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "master"'
+  script:
+    - echo "https://oauth2:${GITEE_TOKEN}@${GITEE_REPO#https://}"
+    - git push https://oauth2:${GITEE_TOKEN}@${GITEE_REPO#https://}  HEAD:master --force
+  tags:
+    - kk

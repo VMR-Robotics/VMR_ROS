@@ -1,0 +1,11 @@
+lx_ros_interface:
+  ros__parameters:
+    frame_id: ""
+    ip: "127.0.0.1"
+    host: 9000
+    odom: "/odom"  # 订阅里程计话题
+    laser_1: "/scan1"
+    laser_2: "/scan2"
+    twist:  "/twist"
+    light: "/light"
+    lift: "/lift"

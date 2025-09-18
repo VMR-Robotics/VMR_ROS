@@ -1,0 +1,10 @@
+std_msgs/Header header
+int16 error_code
+int16 voltage
+int16 temperature
+float32 position
+float32 speed
+int16 current
+bool moving_flag
+bool enable_flag
+int8 work_mode

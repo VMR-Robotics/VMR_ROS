@@ -1,0 +1,4 @@
+geometry_msgs/PoseStamped input_pose
+---
+int32 code
+string message
