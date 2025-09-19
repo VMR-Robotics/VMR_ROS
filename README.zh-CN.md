@@ -29,10 +29,15 @@
 
 ### 接口
 #### ros2 订阅
-| 接口               | 类型               | 数据类型               | 说明                                                         |
+| 订阅名             | 类型               | 数据类型               | 说明                                                         |
 | ------------------ | ------------------ | --------------------- | ------------------------------------------------------------ |
 | $twist             | Subscriber topic   | geometry_msgs/msg/Twist    | 订阅速度控制                                         |
-| $twist             | Service            | geometry_msgs/msg/Twist    | 订阅速度控制                                         |
+
+#### ros2 service
+| 接口名               | 类型               | 数据类型               | 说明                                                         |
+| -------------------- | ------------------ | --------------------- | ------------------------------------------------------------ |
+| /vmr/robot_lift_ctrl | Service           | vmr_ros_pkg/srv/LiftCtrl | 控制顶升                                        |
+| /vmr/robot_light_ctrl | Service          | vmr_ros_pkg/srv/LightCtrl| 控制灯光                                         |
 
 
 
@@ -47,3 +52,4 @@
 | /vmr/robot_exception | ros2 topic   | vmr/msg/RobotException | 发布异常状态                                              |
 
 
+https://github.com/qicosmos/rest_rpc
