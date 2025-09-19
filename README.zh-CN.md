@@ -2,8 +2,9 @@
 
 本模块通过sdk可以控制底盘  程序目前仅支持从源代码构建
 
+
 ### 配置
-  配置文件： vmr_ros_pkg/config/lx_config.yaml
+  配置文件： vmr_ros_pkg/config/vmr_config.yaml
 
   | 配置项          | 类型     | 举例          | 说明                                                         |
   | --------------- | -------- | ------------- | ------------------------------------------------------------ |
@@ -17,15 +18,12 @@
 
 1. 将文件放在ros2工作区下
 
-2. 输入指令：source /opt/ros/$ROS_VERSION/setup.bash
-
-3. 输入指令：colcon build --packages-select vmr_ros_pkg
-
-4. 输入指令：source install/setup.bash
-
-5. 输入指令：ros2 launch vmr_ros_pkg lx_bringup.launch.py
-
-
+```bash
+source /opt/ros/$ROS_VERSION/setup.bash
+colcon build --packages-select vmr_ros_pkg
+source install/setup.bash
+ros2 launch vmr_ros_pkg vmr_bringup.launch.py
+```
 
 ### 接口
 #### ros2 订阅
@@ -36,8 +34,9 @@
 #### ros2 service
 | 接口名               | 类型               | 数据类型               | 说明                                                         |
 | -------------------- | ------------------ | --------------------- | ------------------------------------------------------------ |
-| /vmr/robot_lift_ctrl | Service           | vmr_ros_pkg/srv/LiftCtrl | 控制顶升                                        |
+| /vmr/robot_lift_ctrl | Service           | vmr_ros_pkg/srv/LiftCtrl | 下发顶升任务                                        |
 | /vmr/robot_light_ctrl | Service          | vmr_ros_pkg/srv/LightCtrl| 控制灯光                                         |
+| /vmr/robot_task_result | Service           | vmr_ros_pkg/srv/TaskResult | 任务查询                                        |
 
 
 
@@ -52,4 +51,9 @@
 | /vmr/robot_exception | ros2 topic   | vmr/msg/RobotException | 发布异常状态                                              |
 
 
-https://github.com/qicosmos/rest_rpc
+
+
+
+
+#### 通讯协议 
+通讯协议采用[rest_rpc](https://github.com/qicosmos/rest_rpc) 进行与 vmr robot 通讯

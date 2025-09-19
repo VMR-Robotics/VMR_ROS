@@ -55,19 +55,19 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   DEPENDENCIES geometry_msgs 
 )
 
-add_executable(lx_ros_interface src/lx_ros.cpp)
-ament_target_dependencies(lx_ros_interface
+add_executable(vmr_ros_interface src/vmr_ros.cpp)
+ament_target_dependencies(vmr_ros_interface
   rclcpp std_msgs nav_msgs sensor_msgs geometry_msgs)
 
 rosidl_get_typesupport_target(cpp_typesupport_target vmr_ros_pkg "rosidl_typesupport_cpp")
-target_link_libraries(lx_ros_interface "${cpp_typesupport_target}")
+target_link_libraries(vmr_ros_interface "${cpp_typesupport_target}")
 
-target_include_directories(lx_ros_interface PUBLIC
+target_include_directories(vmr_ros_interface PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 
 
-install(TARGETS lx_ros_interface
+install(TARGETS vmr_ros_interface
   DESTINATION lib/${PROJECT_NAME})
 install(DIRECTORY config launch
   DESTINATION share/${PROJECT_NAME})

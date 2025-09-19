@@ -10,7 +10,7 @@ def generate_launch_description():
     default_config_path = os.path.join(
         get_package_share_directory('vmr_ros_pkg'),
         'config',
-        'lx_config.yaml'
+        'vmr_config.yaml'
     )
 
     # 2. 声明 launch 参数，允许在命令行覆盖
@@ -20,13 +20,13 @@ def generate_launch_description():
         DeclareLaunchArgument(
             'config_file',
             default_value=default_config_path,
-            description='Full path to lx_config.yaml'
+            description='Full path to vmr_config.yaml'
         ),
 
         Node(
             package='vmr_ros_pkg',
-            executable='lx_ros_interface',
-            name='lx_ros_interface',
+            executable='vmr_ros_interface',
+            name='vmr_ros_interface',
             output='screen',
             parameters=[config_file]   # 自动把 yaml 内容加载到节点参数空间
         ),

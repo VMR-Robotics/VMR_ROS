@@ -1,5 +1,5 @@
-#ifndef RPC_DATA_H
-#define RPC_DATA_H
+#ifndef VMR_DATA_H
+#define VMR_DATA_H
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "geometry_msgs/msg/pose_with_covariance_stamped.hpp"
 #include "nav_msgs/msg/odometry.hpp"
@@ -27,7 +27,7 @@
 #include "vmr_ros_pkg/msg/dog_state.hpp"
 
 inline float normalize(float angle) {
-  if (std::fabs(angle) > M_PI * 2) { // 取余
+  if (std::fabs(angle) > M_PI * 2) { 
     angle = angle - long(angle / (M_PI * 2)) * M_PI * 2;
   }
   while (angle > M_PI) {
@@ -38,6 +38,10 @@ inline float normalize(float angle) {
   }
   return angle;
 }
+
+
+// VMR Header 
+// Implemented overloads to convert vmr Header to/from std_msgs::msg::Header.
 struct Header {
   uint32_t seq{0};
   uint64_t timestamp_ns;
@@ -57,7 +61,8 @@ struct Header {
     return data;
   }
 };
-// 基础几何类型
+// VMR Vector3 
+// Implemented overloads to convert vmr Vector3 to/from geometry_msgs::msg::Vector3.
 struct Vector3 {
   double x, y, z;
   MSGPACK_DEFINE(x, y, z)
@@ -76,6 +81,8 @@ struct Vector3 {
   }
 };
 
+// VMR Point 
+// Implemented overloads to convert vmr Point to/from geometry_msgs::msg::Point.
 struct Point {
   double x, y, z;
   MSGPACK_DEFINE(x, y, z)
@@ -94,6 +101,8 @@ struct Point {
   }
 };
 
+// VMR Quaternion 
+// Implemented overloads to convert vmr Quaternion to/from geometry_msgs::msg::Quaternion.
 struct Quaternion {
   double x, y, z, w;
   MSGPACK_DEFINE(x, y, z, w)
@@ -114,6 +123,9 @@ struct Quaternion {
   }
 };
 
+
+// VMR Pose 
+// Implemented overloads to convert VMR Pose to/from geometry_msgs::msg::Pose.
 struct Pose {
   Point position;
   Quaternion orientation;
@@ -131,23 +143,6 @@ struct Pose {
   }
 };
 
-// struct PoseWithCovariance {
-//     Pose pose;
-//     double[36] covariance;
-//     MSGPACK_DEFINE(pose, covariance)
-//     PoseWithCovariance& operator=(const
-//     geometry_msgs::msg::PoseWithCovariance& other) {
-//         pose = other.pose;
-//         covariance = other.covariance;
-//         return *this;
-//     }
-//     operator geometry_msgs::msg::PoseWithCovariance() const {
-//         geometry_msgs::msg::PoseWithCovariance data;
-//         data.pose = pose;
-//         data.covariance = covariance;
-//         return data;
-//     }
-// };
 
 struct Twist {
   Vector3 linear;
@@ -181,23 +176,7 @@ struct BasicOdometry {
 
   MSGPACK_DEFINE(header, child_frame_id, pose, twist)
 
-  // Odometry& operator=(const nav_msgs::msg::Odometry& other) {
-  //     header = other.header;
-  //     child_frame_id = other.child_frame_id;
-  //     pose = other.pose;
-  //     twist = other.twist;
-  //     return *this;
-  // }
-  // operator nav_msgs::msg::Odometry() const {
-  //     nav_msgs::msg::Odometry data;
-  //     data.header = header;
-  //     data.child_frame_id = child_frame_id;
-  //     data.pose = pose;
-  //     data.twist = twist;
-  //     return data;
-  // }
 
-  // 从ROS消息转换
   static BasicOdometry fromRos(const nav_msgs::msg::Odometry &ros_msg) {
     BasicOdometry odom;
     odom.header.frame_id = ros_msg.header.frame_id;
@@ -206,7 +185,6 @@ struct BasicOdometry {
         ros_msg.header.stamp.nanosec;
     odom.child_frame_id = ros_msg.child_frame_id;
 
-    // 转换pose
     odom.pose.position.x = ros_msg.pose.pose.position.x;
     odom.pose.position.y = ros_msg.pose.pose.position.y;
     odom.pose.position.z = ros_msg.pose.pose.position.z;
@@ -214,7 +192,6 @@ struct BasicOdometry {
         ros_msg.pose.pose.orientation.x, ros_msg.pose.pose.orientation.y,
         ros_msg.pose.pose.orientation.z, ros_msg.pose.pose.orientation.w};
 
-    // 转换twist
     odom.twist.linear.x = ros_msg.twist.twist.linear.x;
     odom.twist.linear.y = ros_msg.twist.twist.linear.y;
     odom.twist.linear.z = ros_msg.twist.twist.linear.z;
@@ -224,7 +201,6 @@ struct BasicOdometry {
     return odom;
   }
 
-  // 转换为ROS消息
   nav_msgs::msg::Odometry toRos() const {
     nav_msgs::msg::Odometry ros_msg;
     ros_msg.header.frame_id = header.frame_id;
@@ -255,17 +231,12 @@ struct BasicOdometry {
   std::string toString() const {
     std::ostringstream oss;
 
-    // 设置输出格式（固定小数点，保留3位小数）
     oss << std::fixed << std::setprecision(3);
-
-    // 打印头部信息
     oss << "Odometry Data:\n";
     oss << "  Header:\n";
     oss << "    Frame ID: " << header.frame_id << "\n";
     oss << "    Timestamp: " << header.timestamp_ns / 1000000000ULL << "."
         << header.timestamp_ns % 1000000000ULL << "\n";
-
-    // 打印位姿信息
     oss << "  Pose:\n";
     oss << "    Position: [" << pose.position.x << ", " << pose.position.y
         << ", " << pose.position.z << "]\n";
@@ -273,14 +244,11 @@ struct BasicOdometry {
         << pose.orientation.y << ", " << pose.orientation.z << ", "
         << pose.orientation.w << "]\n";
 
-    // 打印速度信息
     oss << "  Twist:\n";
     oss << "    Linear: [" << twist.linear.x << ", " << twist.linear.y << ", "
         << twist.linear.z << "]\n";
     oss << "    Angular: [" << twist.angular.x << ", " << twist.angular.y
         << ", " << twist.angular.z << "]\n";
-
-    // 打印子坐标系
     oss << "  Child Frame ID: " << child_frame_id << "\n";
 
     return oss.str();
@@ -291,22 +259,20 @@ struct BasicLaserScan {
 
   Header header;
   // 扫描参数
-  float angle_min;       // 起始弧度（-π~π）
-  float angle_max;       // 结束弧度（-π~π）
-  float angle_increment; // 角分辨率（弧度/样本）
-  float time_increment;  // 时间间隔（秒/样本）
-  float scan_time;       // 扫描总耗时（秒）
-  float range_min;       // 最小有效距离（米）
-  float range_max;       // 最大有效距离（米）
+  float angle_min;     
+  float angle_max;      
+  float angle_increment; 
+  float time_increment;  
+  float scan_time;      
+  float range_min;      
+  float range_max;      
 
-  // 扫描数据
-  std::vector<float> ranges;      // 距离数据（米）
-  std::vector<float> intensities; // 强度数据（可选）
+  std::vector<float> ranges;     
+  std::vector<float> intensities; 
 
   MSGPACK_DEFINE(header, angle_min, angle_max, angle_increment, time_increment,
                  scan_time, range_min, range_max, ranges, intensities)
 
-  // 从ROS消息转换
   static BasicLaserScan fromRos(const sensor_msgs::msg::LaserScan &ros_msg) {
     BasicLaserScan scan;
     scan.header.frame_id = ros_msg.header.frame_id;
@@ -325,7 +291,6 @@ struct BasicLaserScan {
     return scan;
   }
 
-  // 转换为ROS消息
   sensor_msgs::msg::LaserScan toRos() const {
     sensor_msgs::msg::LaserScan ros_msg;
     ros_msg.header.frame_id = header.frame_id;
@@ -345,11 +310,9 @@ struct BasicLaserScan {
     return ros_msg;
   }
 
-  // 实用方法
   size_t size() const { return ranges.size(); }
   bool hasIntensities() const { return !intensities.empty(); }
 
-  // 获取有效数据点数量
   size_t validCount() const {
     size_t count = 0;
     for (float r : ranges) {
@@ -374,7 +337,6 @@ struct BasicPose {
   Header header;
   Pose pose;
   MSGPACK_DEFINE(header, pose)
-  // 从ROS消息转换
   static BasicPose
   fromRos(const geometry_msgs::msg::PoseStamped &pose_stamped) {
     BasicPose basic_pose;
@@ -394,7 +356,6 @@ struct BasicPose {
   }
 };
 
-// 里程计数据 (纯基本类型)
 struct LocState {
   BasicOdometry basic_odom;
   int exception{0};
@@ -435,7 +396,6 @@ struct PoseWithCovarianceStamped {
   Header header;
   PoseWithCovariance pose;
   MSGPACK_DEFINE(header, pose)
-  // 从ROS消息转换
   static PoseWithCovarianceStamped
   fromRos(const geometry_msgs::msg::PoseWithCovarianceStamped &pose_stamped) {
     PoseWithCovarianceStamped data;
@@ -576,7 +536,7 @@ struct Light {
 
 struct ServoState {
   Header header;
-  uint16_t error_code = 0; // 协议为16位
+  uint16_t error_code = 0;
 
   uint16_t voltage = 0;
 

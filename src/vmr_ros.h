@@ -14,14 +14,14 @@
 #include "vmr_ros_pkg/msg/lift_state.hpp"
 #include "vmr_ros_pkg/msg/dog_state.hpp"
 
-// #include "lx_motor_interfaces/msg/motor_status.hpp"
+// #include "vmr_motor_interfaces/msg/motor_status.hpp"
 
 // 对应原 RobotState.msg
 #include "sensor_msgs/msg/laser_scan.hpp"
 #include "std_msgs/msg/string.hpp"
 
 #include "rest_rpc.hpp"
-#include "rpc_data.h"
+#include "vmr_data.h"
 #include "vmr_ros_pkg/msg/exception.hpp"
 
 #include "vmr_ros_pkg/msg/robot_exception.hpp"

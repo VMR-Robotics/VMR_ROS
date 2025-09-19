@@ -15,14 +15,15 @@
 #include "sensor_msgs/msg/laser_scan.hpp"
 #include "std_msgs/msg/string.hpp"
 
-#include "lx_ros.h"
+#include "vmr_ros.h"
 #include "rest_rpc.hpp"
-#include "rpc_data.h"
+#include "vmr_data.h"
 using namespace rest_rpc;
 using namespace rpc_service;
 
-ListenerNode::ListenerNode() : Node("lx_ros_interface") {
+ListenerNode::ListenerNode() : Node("vmr_ros_interface") {
   // 参数声明
+  // Parameter declaration
   this->declare_parameter<std::string>("ip", "127.0.0.1");
   this->declare_parameter<int>("host", 9000);
   this->declare_parameter<std::string>("odom", "");
@@ -30,9 +31,9 @@ ListenerNode::ListenerNode() : Node("lx_ros_interface") {
   this->declare_parameter<std::string>("laser_2", "");
   this->declare_parameter<std::string>("locate", "");
   this->declare_parameter<std::string>("twist", "");
-  this->declare_parameter<std::string>("light", "");
   this->declare_parameter<std::string>("frame_id", "");
   // 读取参数
+  // Read parameters
   std::string ip = this->get_parameter("ip").as_string();
   int host = this->get_parameter("host").as_int();
 
@@ -43,7 +44,6 @@ ListenerNode::ListenerNode() : Node("lx_ros_interface") {
 
   std::string twist_topic = this->get_parameter("twist").as_string();
 
-  std::string light_topic = this->get_parameter("light").as_string();
 
   frame_id = this->get_parameter("frame_id").as_string();
 
@@ -68,7 +68,8 @@ ListenerNode::ListenerNode() : Node("lx_ros_interface") {
   cli.enable_auto_heartbeat();
   RCLCPP_INFO(this->get_logger(), "RPC connected");
 
-  // 订阅 / 发布
+  // 订阅 ros 输入 数据
+  // Subscribe to the ros topic data 
   if (!odom_topic.empty())
     sub_odom_ = this->create_subscription<nav_msgs::msg::Odometry>(
         odom_topic, 1000,
@@ -90,15 +91,12 @@ ListenerNode::ListenerNode() : Node("lx_ros_interface") {
         geometry_msgs::msg::PoseWithCovarianceStamped>(
         locate_topic, 1000,
         std::bind(&ListenerNode::processPose, this, std::placeholders::_1));
+  //是否配置了速度下发topic
+  //  Indicates if the speed-command topic is configured
   if (!twist_topic.empty())
     sub_twist_ = this->create_subscription<geometry_msgs::msg::Twist>(
         twist_topic, 1000,
         std::bind(&ListenerNode::twistCallback, this, std::placeholders::_1));
-  if (!light_topic.empty())
-    sub_light_ = this->create_subscription<vmr_ros_pkg::msg::Light>(
-        light_topic, 1000,
-        std::bind(&ListenerNode::lightCallback, this, std::placeholders::_1));
-
   pub_state_ = this->create_publisher<vmr_ros_pkg::msg::RobotState>(
       "/vmr/robot_loc_state", 100);
 
@@ -124,7 +122,8 @@ ListenerNode::ListenerNode() : Node("lx_ros_interface") {
       this->create_publisher<vmr_ros_pkg::msg::RobotException>(
           "/vmr/robot_exception_state", 100);
 
-  // RPC 反向订阅
+  // 订阅 威迈尔机器人 数据
+  // Subscribe to the vmr robot data 
   cli.subscribe("hontai/rob_data",
                 [this](string_view data) { bo_callback(data); });
 
@@ -198,35 +197,6 @@ void ListenerNode::lightCallback(
   try {
     if (cli.has_connected()) {
       cli.call<int>("control_light", light);
-    }
-  } catch (const std::exception &e) {
-    RCLCPP_ERROR(this->get_logger(), "RPC error: %s", e.what());
-  }
-}
-
-// 控制左右头
-void ListenerNode::header_LR_Callback(
-    const vmr_ros_pkg::msg::ServoState::SharedPtr data) {
-  ServoState light = *data;
-  RCLCPP_INFO(this->get_logger(), "light time : %s",
-              std::to_string(light.header.timestamp_ns).c_str());
-  try {
-    if (cli.has_connected()) {
-      cli.call<int>("control_head_LR", light);
-    }
-  } catch (const std::exception &e) {
-    RCLCPP_ERROR(this->get_logger(), "RPC error: %s", e.what());
-  }
-}
-
-void ListenerNode::header_UD_Callback(
-    const vmr_ros_pkg::msg::ServoState::SharedPtr data) {
-  ServoState light = *data;
-  RCLCPP_INFO(this->get_logger(), "light time : %s",
-              std::to_string(light.header.timestamp_ns).c_str());
-  try {
-    if (cli.has_connected()) {
-      cli.call<int>("control_head_UD", light);
     }
   } catch (const std::exception &e) {
     RCLCPP_ERROR(this->get_logger(), "RPC error: %s", e.what());
@@ -323,11 +293,11 @@ void ListenerNode::lift_state_callback(string_view data) {
     msg.header.frame_id = frame_id;
     pub_lift_state_->publish(msg);
   }
-  // lx_motor_interfaces::msg::MotorStatus left_state;
+  // vmr_motor_interfaces::msg::MotorStatus left_state;
   // left_state.data[0] = p.height/1000.0;
   // if (pub_lift_join_state_) {
   //     msg.header.frame_id = frame_id;
-  //     lx_motor_interfaces->publish(left_state);
+  //     vmr_motor_interfaces->publish(left_state);
   // }
 }
 void ListenerNode::dog_state_callback(string_view data) {
